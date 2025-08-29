@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Craving Canteen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #ffe5e5, #ffffff);
+      margin: 0;
+      padding: 20px;
+      animation: fadeInBody 1s ease-in;
+    }
+
+    @keyframes fadeInBody {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #b30000;
+      font-size: 2em;
+      margin-top: 10px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #b30000;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .food-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 200px;
+      padding: 16px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    .food-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .food-card h3 {
+      margin: 10px 0 5px;
+    }
+
+    .food-card p {
+      margin: 5px 0;
+    }
+
+    .food-card button {
+      background: #e60000;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .food-card button:hover {
+      background: #cc0000;
+    }
+
+    .order-summary {
+      max-width: 600px;
+      margin: 30px auto;
+      background: #fff0f0;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .order-summary ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .order-summary li {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .total {
+      font-weight: bold;
+      margin-top: 15px;
+      text-align: right;
+      color: #b30000;
+    }
+
+    .place-order-btn {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      font-size: 16px;
+      background: #d90000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .place-order-btn:hover {
+      background: #c20000;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    footer a {
+      color: #b30000;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Craving Canteen</h1>
+  </header>
+
+  <section class="container" id="menu">
+    <!-- Food items will be inserted here -->
+  </section>
+
+  <section class="order-summary" id="order-summary">
+    <h2>Your Order</h2>
+    <ul id="order-list">
+      <li>No items added.</li>
+    </ul>
+    <p class="total" id="order-total">Total: ₹0</p>
+    <button class="place-order-btn" onclick="placeOrder()">Place Order</button>
+  </section>
+
+  <footer>
+    📞 Contact: <a href="tel:7780468886">7780468886</a> |  Mail: <a href="https://cravecanteen.com" target="_blank">cravecanteen.com</a>
+  </footer>
+
+  <script>
+    const menuItems = [
+      { id: 1, name: "Chicken Fried Rice", price: 85 },
+      { id: 2, name: "Veg Fried Rice", price: 50 },
+      { id: 3, name: "Veg Noodles", price: 50 },
+      { id: 4, name: "Egg Noodles", price: 70 },
+      { id: 5, name: "Chicken Noodles", price: 70 },
+      { id: 6, name: "Samosa", price: 20 },
+      { id: 7, name: "Small Samosa", price: 5 },
+      { id: 8, name: "Challa Punukulu", price: 20 },
+      { id: 9, name: "Curry Puff", price: 15 },
+      { id: 10, name: "Egg Puff", price: 20 },
+      { id: 11, name: "Bread Bajji", price: 20 }
+    ];
+
+    const order = [];
+
+    function renderMenu() {
+      const menuContainer = document.getElementById('menu');
+      menuItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'food-card';
+        card.innerHTML = `
+          <h3>${item.name}</h3>
+          <p>₹${item.price}</p>
+          <button onclick="addToOrder(${item.id})">Add to Order</button>
+        `;
+        menuContainer.appendChild(card);
+      });
+    }
+
+    function addToOrder(id) {
+      const item = menuItems.find(i => i.id === id);
+      order.push(item);
+      updateOrderSummary();
+    }
+
+    function updateOrderSummary() {
+      const list = document.getElementById('order-list');
+      list.innerHTML = '';
+
+      if (order.length === 0) {
+        list.innerHTML = '<li>No items added.</li>';
+        document.getElementById('order-total').textContent = 'Total: ₹0';
+        return;
+      }
+
+      order.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `${item.name} <span>₹${item.price}</span>`;
+        list.appendChild(li);
+      });
+
+      const total = order.reduce((sum, item) => sum + item.price, 0);
+      document.getElementById('order-total').textContent = 'Total: ₹' + total;
+    }
+
+    function placeOrder() {
+      if (order.length === 0) {
+        alert("Please add items before placing an order.");
+        return;
+      }
+
+      let message = "Order Placed!\n\nItems:\n";
+      order.forEach(item => {
+        message += `- ${item.name} (₹${item.price})\n`;
+      });
+      message += "\nTotal: ₹" + order.reduce((sum, item) => sum + item.price, 0);
+      alert(message);
+
+      order.length = 0;
+      updateOrderSummary();
+    }
+
+    renderMenu();
+  </script>
+
+</body>
+</html>
